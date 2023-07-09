@@ -65,3 +65,4 @@ public class IntList {
         return new IntList(argList[0], IntList.of(restList));
     }
 }
+

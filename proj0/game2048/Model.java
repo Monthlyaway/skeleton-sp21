@@ -7,7 +7,7 @@ import java.util.Observable;
 /**
  * The state of a game of 2048.
  *
- * @author Wilson Yang
+ * @author TODO: YOUR NAME HERE
  */
 public class Model extends Observable {
     /**
@@ -17,7 +17,7 @@ public class Model extends Observable {
     /**
      * Current contents of the board.
      */
-    private Board board;
+    private final Board board;
     /**
      * Current score.
      */
@@ -57,6 +57,22 @@ public class Model extends Observable {
         this.score = score;
         this.maxScore = maxScore;
         this.gameOver = gameOver;
+    }
+
+    /**
+     * Returns true if at least one space on the Board is empty.
+     * Empty spaces are stored as null.
+     */
+    public static boolean emptySpaceExists(Board b) {
+        // TODO: Fill in this function.
+        for (int i = 0; i != b.size(); i++) {
+            for (int j = 0; j != b.size(); j++) {
+                if (b.tile(i, j) == null) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -100,9 +116,12 @@ public class Model extends Observable {
      * given a Tile object t, we get its value with t.value().
      */
     public static boolean maxTileExists(Board b) {
-        for (int ix = 0; ix < b.size(); ix++) {
-            for (int jx = 0; jx < b.size(); jx++) {
-                if (b.tile(jx, ix) != null && b.tile(jx, ix).value() == MAX_PIECE) {
+        // TODO: Fill in this function.
+        for (int i = 0; i != b.size(); i++) {
+            for (int j = 0; j != b.size(); j++) {
+                if (b.tile(i, j) == null) {
+                    continue;
+                } else if (b.tile(i, j).value() == MAX_PIECE) {
                     return true;
                 }
             }
@@ -117,37 +136,23 @@ public class Model extends Observable {
      * 2. There are two adjacent tiles with the same value.
      */
     public static boolean atLeastOneMoveExists(Board b) {
-        if (emptySpaceExists(b)) {
-            return true;
-        }
-        for (int col = 0; col < b.size(); col++) {
-            for (int row = 0; row < b.size(); row++) {
-                if (col != b.size() - 1 && b.tile(col, row).value() == b.tile(col + 1, row).value()) {
+        // TODO: Fill in this function.
+        for (int i = 0; i != b.size(); i++) {
+            for (int j = 0; j != b.size(); j++) {
+                if (b.tile(i, j) == null) {
                     return true;
-                }
-                if (row != b.size() - 1 && b.tile(col, row).value() == b.tile(col, row + 1).value()) {
+                } else if (equal(b, i, j, i + 1, j) || equal(b, i, j, i - 1, j)
+                        || equal(b, i, j, i, j + 1) || equal(b, i, j, i, j - 1))
                     return true;
-                }
-
             }
         }
-
         return false;
     }
 
-    /**
-     * Returns true if at least one space on the Board is empty.
-     * Empty spaces are stored as null.
-     */
-    public static boolean emptySpaceExists(Board b) {
-        for (int ix = 0; ix < b.size(); ix++) {
-            for (int jx = 0; jx < b.size(); jx++) {
-                if (b.tile(ix, jx) == null) {
-                    return true;
-                }
-            }
-        }
-        return false;
+    private static boolean equal(Board b, int col1, int row1, int col2, int row2) {
+        if (col2 < 0 || col2 == b.size() || row2 < 0 || row2 == b.size())
+            return false;
+        else return b.tile(col1, row1).value() == b.tile(col2, row2).value();
     }
 
     /**
@@ -170,20 +175,42 @@ public class Model extends Observable {
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
-
-//        System.out.println("Board before tilting: " + toString() + score);
         board.setViewingPerspective(side);
-//        System.out.println("Board changing perspective: " + toString() + score);
 
-        for (int c = 0; c < board.size(); c++) {
-            if (modifyCol(c)) {
-                changed = true;
+        boolean[] change = new boolean[board.size()];
+        for (int i = 0; i != board.size(); i++)
+            change[i] = false;
+
+        for (int i = 0; i != board.size(); i++) {
+            int taken = 0;
+            int value = -1;
+            int notempty = board.size();
+
+            while (notempty != 0) {
+                notempty = firstnotemptytilefromheight(i, board.size() - taken - 1);
+                if (notempty == board.size())
+                    break;
+                else {
+                    if (board.tile(i, notempty).value() == value) {
+                        value = mergemove(i, taken, notempty);
+                        change[i] = true;
+                    } else {
+                        value = notmergemove(i, taken, notempty);
+                        if (board.size() - taken - 1 != notempty) {
+                            change[i] = true;
+                        }
+                        taken++;
+                    }
+                }
             }
-//            System.out.println("Handled column " + c + ": " + toString() + score);
         }
 
+        for (int i = 0; i != board.size(); i++)
+            if (change[i])
+                changed = true;
+
         board.setViewingPerspective(Side.NORTH);
-//        System.out.println("Board perspective changed back: " + toString() + score);
+
         checkGameOver();
         if (changed) {
             setChanged();
@@ -191,80 +218,27 @@ public class Model extends Observable {
         return changed;
     }
 
-    private boolean modifyCol(int curCol) {
-        boolean changed = false;
-        int maxRow = board.size();
-        boolean[] availDests = new boolean[maxRow];
-        // default value is false
-
-        for (int curRow = maxRow - 1; curRow >= 0; curRow--) {
-            if (board.tile(curCol, curRow) == null) {
-                availDests[curRow] = true;
-                continue;
+    private int firstnotemptytilefromheight(int i, int height) {
+        for (int j = height; j >= 0; j--) {
+            if (board.tile(i, j) != null) {
+                return j;
             }
-            int curVal = board.tile(curCol, curRow).value();
-            Tile curTile = board.tile(curCol, curRow);
-            int tileAboveRow = firstTileAbove(curCol, curRow);
-
-            if (tileAboveRow == -1) {
-                // No merging here
-                if (curRow == maxRow - 1) {
-                    availDests[curRow] = true;
-                } else {
-                    board.move(curCol, maxRow - 1, curTile);
-                    changed = true;
-                    availDests[curRow] = availDests[maxRow - 1] = true;
-                }
-                continue;  // need not move, no space up
-            } else {
-                if (board.tile(curCol, tileAboveRow).value()
-                        != curVal) {
-                    // move to one position below, no merging here
-                    if (tileAboveRow != curRow + 1) {
-                        board.move(curCol, tileAboveRow - 1, curTile);
-                        changed = true;
-                        availDests[curRow] = availDests[tileAboveRow - 1] = true;
-                    } else {
-                        availDests[curRow] = true;
-                    }
-                } else {
-                    if (availDests[tileAboveRow] == true) {
-                        board.move(curCol, tileAboveRow, curTile);
-                        score += 2 * curVal;
-                        changed = true;
-                        availDests[curRow] = true;
-                        availDests[tileAboveRow] = false;
-                    } else {
-                        board.move(curCol, tileAboveRow - 1, curTile);
-                        changed = true;
-                        availDests[curRow] = true;
-                        availDests[tileAboveRow - 1] = true;
-                    }
-                }
-            }
-
         }
-
-        return changed;
+        return board.size();
     }
 
+    private int notmergemove(int i, int taken, int notempty) {
+        Tile t = board.tile(i, notempty);
+        int value = t.value();
+        board.move(i, board.size() - taken - 1, t);
+        return value;
+    }
 
-    /**
-     * @param col
-     * @param row
-     * @return row index of the first not null tile above,
-     * if doesn't exist, which means two cases: everty tile above is null,
-     * or this is the highest tile
-     */
-    private int firstTileAbove(int col, int row) {
-        int result = -1;
-        for (int ix = row + 1; ix < board.size(); ix++) {
-            if (board.tile(col, ix) != null) {
-                result = ix;
-                return result;
-            }
-        }
-        return result;
+    private int mergemove(int i, int taken, int notempty) {
+        Tile t = board.tile(i, notempty);
+        score += 2 * t.value();
+        board.move(i, board.size() - taken, t);
+        return -1;
     }
 
     @Override
