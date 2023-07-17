@@ -1,5 +1,6 @@
 package deque;
 
+
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -10,7 +11,7 @@ import edu.princeton.cs.algs4.StdRandom;
 /**
  * Performs some basic linked list tests.
  */
-public class LinkedListDequeTest {
+public class ArrayDequeTest {
 
     @Test
     /** Adds a few things to the list, checking isEmpty() and size() are correct,
@@ -18,7 +19,7 @@ public class LinkedListDequeTest {
      *
      * && is the "and" operation. */
     public void addIsEmptySizeTest() {
-        LinkedListDeque<String> arrd1 = new LinkedListDeque<String>();
+        ArrayDeque<String> arrd1 = new ArrayDeque<String>();
 
         assertTrue("A newly initialized LLDeque should be empty", arrd1.isEmpty());
         arrd1.addFirst("front");
@@ -41,7 +42,7 @@ public class LinkedListDequeTest {
     @Test
     /** Adds an item, then removes an item, and ensures that dll is empty afterwards. */
     public void addRemoveTest() {
-        LinkedListDeque<Integer> arrd1 = new LinkedListDeque<Integer>();
+        ArrayDeque<Integer> arrd1 = new ArrayDeque<Integer>();
         // should be empty
         assertTrue("arrd1 should be empty upon initialization", arrd1.isEmpty());
 
@@ -59,7 +60,7 @@ public class LinkedListDequeTest {
     public void removeEmptyTest() {
 
 
-        LinkedListDeque<Integer> arrd1 = new LinkedListDeque<>();
+        ArrayDeque<Integer> arrd1 = new ArrayDeque<>();
         arrd1.addFirst(3);
 
         arrd1.removeLast();
@@ -79,9 +80,9 @@ public class LinkedListDequeTest {
     /* Check if you can create LinkedListDeques with different parameterized types*/
     public void multipleParamTest() {
 
-        LinkedListDeque<String> arrd1 = new LinkedListDeque<String>();
-        LinkedListDeque<Double> arrd2 = new LinkedListDeque<Double>();
-        LinkedListDeque<Boolean> arrd3 = new LinkedListDeque<Boolean>();
+        ArrayDeque<String> arrd1 = new ArrayDeque<String>();
+        ArrayDeque<Double> arrd2 = new ArrayDeque<Double>();
+        ArrayDeque<Boolean> arrd3 = new ArrayDeque<Boolean>();
 
         arrd1.addFirst("string");
         arrd2.addFirst(3.14159);
@@ -95,7 +96,7 @@ public class LinkedListDequeTest {
     @Test
     /* check if null is return when removing from an empty LinkedListDeque. */
     public void emptyNullReturnTest() {
-        LinkedListDeque<Integer> arrd1 = new LinkedListDeque<Integer>();
+        ArrayDeque<Integer> arrd1 = new ArrayDeque<Integer>();
 
         boolean passed1 = false;
         boolean passed2 = false;
@@ -105,9 +106,27 @@ public class LinkedListDequeTest {
     }
 
     @Test
+    public void resizeTest() {
+        /**
+         * Set resize to be public method
+         */
+        ArrayDeque<Integer> arrd1 = new ArrayDeque<Integer>(20);
+        arrd1.addFirst(0);
+        arrd1.addFirst(1);
+        arrd1.addLast(2);
+        arrd1.addLast(3);
+        arrd1.addLast(4);
+        arrd1.addLast(5);
+        arrd1.addLast(6);
+        arrd1.printDeque();
+        arrd1.resize(100);
+        arrd1.printDeque();
+    }
+
+    @Test
     /* Add large number of elements to deque; check if order is correct. */
     public void bigLLDequeTest() {
-        LinkedListDeque<Integer> arrd1 = new LinkedListDeque<Integer>();
+        ArrayDeque<Integer> arrd1 = new ArrayDeque<Integer>();
         for (int i = 0; i < 1000000; i++) {
             arrd1.addLast(i);
         }
@@ -123,11 +142,11 @@ public class LinkedListDequeTest {
     }
 
     @Test
-    public  void randomizedTest() {
+    public void randomizedTest() {
         AList<Integer> correct = new AList<>();
-        LinkedListDeque<Integer> broken = new LinkedListDeque<>();
+        ArrayDeque<Integer> broken = new ArrayDeque<>();
 
-        int N = 50000;
+        int N = 500000;
         for (int i = 0; i < N; i += 1) {
             int operationNumber = StdRandom.uniform(0, 4);
             if (operationNumber == 0) {
@@ -153,3 +172,5 @@ public class LinkedListDequeTest {
 
 
 }
+
+

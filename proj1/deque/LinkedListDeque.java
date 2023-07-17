@@ -1,6 +1,6 @@
 package deque;
 
-public class LinkedListDeque<T> {
+public class LinkedListDeque<T> implements Deque<T> {
     private Node sentinel;
     private int size;
 
@@ -11,6 +11,7 @@ public class LinkedListDeque<T> {
         size = 0;
     }
 
+    @Override
     public void addFirst(T item) {
         Node newNode = new Node(item, sentinel, sentinel.next);
         sentinel.next = newNode;
@@ -18,6 +19,7 @@ public class LinkedListDeque<T> {
         size++;
     }
 
+    @Override
     public void addLast(T item) {
         Node newNode = new Node(item, sentinel.prev, sentinel);
         sentinel.prev = newNode;
@@ -25,10 +27,13 @@ public class LinkedListDeque<T> {
         size++;
     }
 
+
+    @Override
     public int size() {
         return size;
     }
 
+    @Override
     public void printDeque() {
         Node curr = sentinel.next;
         while (curr != sentinel) {
@@ -38,6 +43,7 @@ public class LinkedListDeque<T> {
         System.out.println("");
     }
 
+    @Override
     public T removeFirst() {
         if (isEmpty()) {
             return null;
@@ -51,10 +57,7 @@ public class LinkedListDeque<T> {
 
     }
 
-    public boolean isEmpty() {
-        return size == 0;
-    }
-
+    @Override
     public T removeLast() {
         if (isEmpty()) {
             return null;
@@ -67,6 +70,7 @@ public class LinkedListDeque<T> {
         return toRemove.item;
     }
 
+    @Override
     public T get(int index) {
         int ix = 0;
         Node curr = sentinel.next;
@@ -81,15 +85,25 @@ public class LinkedListDeque<T> {
 
     }
 
+    @Override
+    public T getFirst() {
+        return sentinel.next.item;
+    }
+
+    @Override
+    public T getLast() {
+        return sentinel.prev.item;
+    }
+
     public T getRecursive(int index) {
-        getRecursiveHelper(index, sentinel.next);
+        return getRecursiveHelper(index, sentinel.next);
     }
 
     private T getRecursiveHelper(int index, Node curr) {
         if (index == 0) {
             return curr.item;
         }
-        getRecursiveHelper(index - 1, curr.next);
+        return getRecursiveHelper(index - 1, curr.next);
     }
 
     private class Node {

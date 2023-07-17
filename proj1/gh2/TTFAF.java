@@ -23,10 +23,11 @@ public class TTFAF {
             e.printStackTrace();
         }
 
-        // You can also do this:
-        // GuitarPlayer player = new GuitarPlayer(new java.io.File("path/to/music.mid"));
-        // player.play();
+//         You can also do this:
+//         GuitarPlayer player = new GuitarPlayer(new java.io.File("D:/Code/skeleton-sp21/proj1/music/Jim_Croce_-_Time_in_a_Bottle.mid"));
+//         player.play();
     }
+
 
     private static final String TTFAF =
         "H4sICO8zfloCA1RURkFGaW1wcm92ZWQyLm1pZAC1fe1uI0mSWNze2mf4CQwMGhIamu7WSqfRtEYi"
